@@ -1,0 +1,36 @@
+.controllers-container {
+  position: absolute;
+  bottom: 0;
+  height: 70px;
+  width: 100%;
+}
+
+.controllers {
+  width: 90%;
+  margin: auto;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+}
+
+.remaining span {
+  color: white;
+  font-size: 14px;
+}
+
+.controllers-actions {
+  width: max-content;
+  display: flex;
+  margin-top: 10px;
+  gap: 16px;
+  cursor: pointer;
+}

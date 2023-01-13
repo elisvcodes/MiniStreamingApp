@@ -1,0 +1,13 @@
+.player-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: black;
+}
+
+video {
+  height: 100%;
+  width: 100%;
+}
