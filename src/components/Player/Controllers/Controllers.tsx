@@ -17,21 +17,30 @@ const Controllers = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mute, setMute] = useState(false);
-  const [progress, setProgress] = useState(videoNode?.currentTime || 0);
+  const [progress, setProgress] = useState(0);
+  const [videoMetaData, setVideoMetaData] = useState({
+    duration: 0
+  });
 
-  /*
-    * Helps with eslint not throwing a warning for complex expressions 
-    inside the dependency array within hooks.
-    */
-
-  const videoCurrentTime = videoNode?.currentTime;
-  const videoDuration = videoNode?.duration;
-
-  // Update the progress bar
+  // load the video meta data
   useEffect(() => {
-    if (!videoNode || !videoCurrentTime || !videoDuration) return undefined;
-    setProgress((videoNode?.currentTime / videoNode?.duration) * 100);
-  }, [videoNode, videoCurrentTime, videoDuration]);
+    if (!videoNode) return undefined;
+    const handleMetaData = () => {
+      setVideoMetaData({
+        duration: videoNode.duration
+      });
+    };
+    videoNode.addEventListener("loadedmetadata", handleMetaData);
+    return () => {
+      videoNode.removeEventListener("loadedmetadata", handleMetaData);
+    };
+  }, [videoNode, videoNode?.currentTime, videoNode?.duration]);
+
+  // keep track of the progress bar
+  useEffect(() => {
+    if (!videoNode) return undefined;
+    setProgress((videoNode.currentTime / videoMetaData.duration) * 100);
+  }, [videoNode, videoNode?.currentTime, videoMetaData.duration]);
 
   const handleIsPlaying = useCallback(
     (
@@ -99,7 +108,7 @@ const Controllers = ({
   const handleProgressbarClick = (
     e: React.MouseEvent<HTMLProgressElement, MouseEvent>
   ) => {
-    if (!videoNode || !videoDuration) return undefined;
+    if (!videoNode) return undefined;
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -107,12 +116,11 @@ const Controllers = ({
     const progressValue = (x / progressWidth) * 100;
     setProgress(progressValue);
 
-    const newCurrentTime = (videoDuration * progressValue) / 100;
+    const newCurrentTime = (videoMetaData.duration * progressValue) / 100;
     videoNode.currentTime = newCurrentTime;
   };
 
   if (!videoNode) return <></>;
-
   return (
     <div className="controllers-container">
       <div className="controllers">
@@ -120,15 +128,16 @@ const Controllers = ({
           <progress
             className="progress"
             max="100"
-            value={progress}
+            value={`${progress}`}
             onClick={handleProgressbarClick}
           >
             Progress
           </progress>
           <div className="remaining">
             <span>
-              {convertSecondsToMinutes(videoNode.currentTime)}/
-              {convertSecondsToMinutes(videoNode.duration)}
+              {convertSecondsToMinutes(
+                videoMetaData.duration - (videoNode.currentTime ?? 0)
+              )}
             </span>
           </div>
         </div>

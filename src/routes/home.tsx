@@ -12,7 +12,7 @@ export default function Home() {
             key={video.hashed_id}
             relative="path"
           >
-            <img src={video.thumbnail.url} />
+            <img src={video.thumbnail.url} alt="" />
             <p>{video.name}</p>
           </Link>
         );
